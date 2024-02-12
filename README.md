@@ -1,22 +1,17 @@
-This repository is the example of [@react-ssr/nestjs-express](https://npm.im/@react-ssr/nestjs-express).
+# Nest.js SSR React App with WebRTC
 
-## Usage
+This repository contains a project written in Nest.js that launches a React application using server-side rendering (SSR). The application is a simple implementation of WebRTC.
 
-```zsh
-# installation
-$ git clone https://github.com/saltyshiomix/react-ssr-nestjs-starter.git
-$ cd react-ssr-nestjs-starter
-$ yarn (or `npm install`)
+## Getting Started
 
-# development mode
-$ yarn dev (or `npm run dev`)
+To run the project, first install the dependencies:
 
-# production mode
-$ yarn build (or `npm run build`)
-$ yarn start (or `npm start`)
-```
+npm install
 
-## Related
+Then, start the code:
 
-[saltyshiomix/react-ssr](https://github.com/saltyshiomix/react-ssr) - React SSR as a view template engine
-# WebRTC-example
+npm run start
+
+This will launch the Nest.js server and serve the React application with SSR. 
+
+Enjoy exploring the WebRTC implementation in this project!
