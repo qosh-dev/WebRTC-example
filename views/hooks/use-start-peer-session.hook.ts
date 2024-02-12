@@ -1,19 +1,17 @@
-import { MutableRefObject, useEffect, useMemo, useState } from 'react';
+import { MutableRefObject, useEffect, useState } from 'react';
 import { PeerConnectionSession } from '../utils/PeerConnectionSession';
 
 export const useStartPeerSession = (
-  room: number,
-  userMediaStream: MediaStream | null,
+  room: number | undefined,
+  mediaStream: MediaStream | null,
   localVideoRef: MutableRefObject<HTMLVideoElement | null>
 ) => {
   // ---------------------------------------------------------------------------
   // Variables
   // ---------------------------------------------------------------------------
 
-  const peerVideoConnection = useMemo(
-    () => PeerConnectionSession.createConnection(),
-    []
-  );
+  const [peerVideoConnection, setPeerVideoConnection] =
+    useState<PeerConnectionSession | null>(null);
   const [displayMediaStream, setDisplayMediaStream] =
     useState<MediaStream | null>(null);
   const [connectedUsers, setConnectedUsers] = useState<string[]>([]);
@@ -22,14 +20,17 @@ export const useStartPeerSession = (
   // Effects
   // ---------------------------------------------------------------------------
   useEffect(() => {
-    if (userMediaStream) {
+    if (!room || !peerVideoConnection) {
+      return;
+    }
+    if (mediaStream) {
       peerVideoConnection.joinRoom(room);
       peerVideoConnection.onAddUser((user) => {
-        console.log({ user11111: user });
+        console.log({"onAddUser": user})
         setConnectedUsers((users) => [...users, user]);
         peerVideoConnection.addPeerConnection(
           `${user}`,
-          userMediaStream,
+          mediaStream,
           (_stream) => {
             (document.getElementById(user) as any).srcObject = _stream;
           }
@@ -43,11 +44,12 @@ export const useStartPeerSession = (
       });
 
       peerVideoConnection.onUpdateUserList(async (users: string[]) => {
+        console.log("onUpdateUserList", users)
         setConnectedUsers(users);
         for (const user of users) {
           peerVideoConnection.addPeerConnection(
             `${user}`,
-            userMediaStream,
+            mediaStream,
             (_stream) => {
               (document.getElementById(user) as any).srcObject = _stream;
             }
@@ -61,22 +63,38 @@ export const useStartPeerSession = (
     }
 
     return () => {
-      if (userMediaStream) {
+      if (mediaStream) {
         peerVideoConnection.clearConnections();
-        userMediaStream?.getTracks()?.forEach((track) => track.stop());
+        mediaStream?.getTracks()?.forEach((track) => track.stop());
       }
     };
-  }, [peerVideoConnection, room, userMediaStream]);
+  }, [peerVideoConnection, room, mediaStream]);
+
+  useEffect(() => {
+    if (!room) {
+      return;
+    }
+    wait(1000).then(() => {
+      setPeerVideoConnection(PeerConnectionSession.createConnection());
+    })
+  }, [room]);
 
   // ---------------------------------------------------------------------------
   // Functions
   // ---------------------------------------------------------------------------
 
+  function refreshPeerVideoConnection() {
+    setPeerVideoConnection(PeerConnectionSession.createConnection());
+  }
+
   async function cancelScreenSharing() {
+    if (!peerVideoConnection) {
+      return;
+    }
     if (!localVideoRef.current) {
       return;
     }
-    if (!userMediaStream) {
+    if (!mediaStream) {
       return;
     }
     if (!displayMediaStream) {
@@ -88,7 +106,7 @@ export const useStartPeerSession = (
 
     if (senders) {
       senders.forEach((sender) => {
-        const track = userMediaStream
+        const track = mediaStream
           .getTracks()
           .find((track) => track.kind === 'video');
         if (!track) {
@@ -98,12 +116,15 @@ export const useStartPeerSession = (
       });
     }
 
-    localVideoRef.current.srcObject = userMediaStream;
+    localVideoRef.current.srcObject = mediaStream;
     displayMediaStream.getTracks().forEach((track) => track.stop());
     setDisplayMediaStream(null);
   }
 
   async function shareScreen() {
+    if (!peerVideoConnection) {
+      return;
+    }
     if (!localVideoRef.current) {
       return;
     }
@@ -123,8 +144,8 @@ export const useStartPeerSession = (
 
     if (senders) {
       senders.forEach((sender) => {
-        if(stream){
-          sender.replaceTrack(stream.getTracks()[0])
+        if (stream) {
+          sender.replaceTrack(stream.getTracks()[0]);
         }
       });
     }
@@ -142,8 +163,18 @@ export const useStartPeerSession = (
   return {
     connectedUsers,
     peerVideoConnection,
+    refreshPeerVideoConnection,
     shareScreen,
     cancelScreenSharing,
     isScreenShared: !!displayMediaStream
   };
 };
+
+async function wait(milliseconds: number): Promise<boolean> {
+  return new Promise((res) => {
+    const timeout = setTimeout(() => {
+      clearTimeout(timeout);
+      res(true);
+    }, milliseconds);
+  });
+}

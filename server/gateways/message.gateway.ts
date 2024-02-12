@@ -3,7 +3,7 @@ import {
   OnGatewayInit,
   SubscribeMessage,
   WebSocketGateway,
-  WebSocketServer,
+  WebSocketServer
 } from '@nestjs/websockets';
 import type { Socket } from 'socket.io';
 
@@ -20,28 +20,22 @@ export class MessageGateway implements OnGatewayInit, OnGatewayDisconnect {
 
   @SubscribeMessage('joinRoom')
   public joinRoom(client: Socket, room: string): void {
-
-    console.log("joinRoom")
-    /*
-    client.join(room);
-    client.emit('joinedRoom', room);
-    */
-
     const existingSocket = this.activeSockets?.find(
-      (socket) => socket.room === room && socket.id === client.id,
+      (socket) => socket.room === room && socket.id === client.id
     );
 
     if (!existingSocket) {
       this.activeSockets = [...this.activeSockets, { id: client.id, room }];
+      const users = this.activeSockets
+        .filter((socket) => socket.room === room && socket.id !== client.id)
+        .map((existingSocket) => existingSocket.id);
       client.emit(`${room}-update-user-list`, {
-        users: this.activeSockets
-          .filter((socket) => socket.room === room && socket.id !== client.id)
-          .map((existingSocket) => existingSocket.id),
-        current: client.id,
+        users,
+        current: client.id
       });
 
       client.broadcast.emit(`${room}-add-user`, {
-        user: client.id,
+        user: client.id
       });
     }
 
@@ -52,7 +46,7 @@ export class MessageGateway implements OnGatewayInit, OnGatewayDisconnect {
   public callUser(client: Socket, data: any): void {
     client.to(data.to).emit('call-made', {
       offer: data.offer,
-      socket: client.id,
+      socket: client.id
     });
   }
 
@@ -60,14 +54,14 @@ export class MessageGateway implements OnGatewayInit, OnGatewayDisconnect {
   public makeAnswer(client: Socket, data: any): void {
     client.to(data.to).emit('answer-made', {
       socket: client.id,
-      answer: data.answer,
+      answer: data.answer
     });
   }
 
   @SubscribeMessage('reject-call')
   public rejectCall(client: Socket, data: any): void {
     client.to(data.from).emit('call-rejected', {
-      socket: client.id,
+      socket: client.id
     });
   }
 
@@ -77,17 +71,17 @@ export class MessageGateway implements OnGatewayInit, OnGatewayDisconnect {
 
   public handleDisconnect(client: Socket): void {
     const existingSocket = this.activeSockets.find(
-      (socket) => socket.id === client.id,
+      (socket) => socket.id === client.id
     );
 
     if (!existingSocket) return;
 
     this.activeSockets = this.activeSockets.filter(
-      (socket) => socket.id !== client.id,
+      (socket) => socket.id !== client.id
     );
 
     client.broadcast.emit(`${existingSocket.room}-remove-user`, {
-      socketId: client.id,
+      socketId: client.id
     });
 
     this.logger.log(`Client disconnected: ${client.id}`);

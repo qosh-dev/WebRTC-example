@@ -1,14 +1,13 @@
 import { useRef } from 'react';
-import { useHistory } from 'react-router-dom';
-import { LocalVideo } from '../components/molecules/LocalVideo';
-
 import { Button } from '../components/atoms/Button';
 import { Gallery } from '../components/layout/Gallery';
+import { LocalVideo } from '../components/molecules/LocalVideo';
 import { RemoteVideo } from '../components/molecules/RemoteVideo';
 import { VideoControls } from '../components/molecules/VideoControls';
 import { Header } from '../components/organisms/Header';
 import { useCalculateVideoLayout } from '../hooks/use-calculate-video-layout.hook';
 import { useCreateMediaStream } from '../hooks/use-create-media-stream.hook';
+import { useCurrentRoom } from '../hooks/use-current-room.hook';
 import { useStartPeerSession } from '../hooks/use-start-peer-session.hook';
 import { toggleFullscreen } from '../utils/helpers';
 
@@ -16,24 +15,26 @@ export const Room = () => {
   // --------------------------------------------------------------------
   // Variables
   // --------------------------------------------------------------------
-  // const { room = 1 } = useParams<{room: string}>();
-  const room = 1;
-  let history = useHistory();
-  const inputRef = useRef<any>(null);
+  const room = useCurrentRoom();
   const galleryRef = useRef<any>(null);
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const mainRef = useRef<any>();
-
-  const userMediaStream = useCreateMediaStream(localVideoRef);
-  const { connectedUsers, shareScreen, cancelScreenSharing, isScreenShared } =
-    useStartPeerSession(room, userMediaStream, localVideoRef);
+  const { mediaStream, refreshMediaStream } =
+    useCreateMediaStream(localVideoRef);
+  const {
+    connectedUsers,
+    shareScreen,
+    cancelScreenSharing,
+    isScreenShared,
+    refreshPeerVideoConnection
+  } = useStartPeerSession(room.roomId, mediaStream, localVideoRef);
 
   // --------------------------------------------------------------------
   // Effects
   // --------------------------------------------------------------------
 
   useCalculateVideoLayout(galleryRef, connectedUsers.length + 1);
-
+  
   // --------------------------------------------------------------------
   // Functions
   // --------------------------------------------------------------------
@@ -52,15 +53,8 @@ export const Room = () => {
 
   // --------------------------------------------------------------------
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center'
-      }}
-    >
-      <Header title="TESTING WEBRTC">
+    <div>
+      <Header title="WEBRTC Example">
         <>
           <div
             style={{
@@ -81,7 +75,6 @@ export const Room = () => {
               Room
             </label>
             <input
-              ref={inputRef}
               style={{
                 padding: '10px',
                 background: '#37526d',
@@ -89,13 +82,14 @@ export const Room = () => {
                 fontSize: '16px',
                 color: 'white'
               }}
+              value={room.tempRoomId}
+              onChange={(v) => room.setRoomId(+v.target.value)}
               id="room"
-              type="text"
+              type="number"
             />
+
+            <Button onClick={() => room.openRoom()}>Open room</Button>
           </div>
-          <Button onClick={() => history.push(`/${inputRef.current.value}`)}>
-            Login
-          </Button>
         </>
       </Header>
 

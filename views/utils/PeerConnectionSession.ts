@@ -79,7 +79,10 @@ export class PeerConnectionSession {
 
   joinRoom(room: number) {
     this._room = room;
-    this.socket.emit('joinRoom', room);
+
+    const res = this.socket.emit('joinRoom', room);
+
+    console.log({ 'Will joinRoom': room, res });
   }
 
   onCallMade() {
@@ -118,10 +121,7 @@ export class PeerConnectionSession {
     });
   }
 
-  onUpdateUserList(callback: {
-    (users: any): Promise<void>;
-    (arg0: any, arg1: any): void;
-  }) {
+  onUpdateUserList(callback: (users: string[], current: string) => void) {
     this.socket.on(`${this._room}-update-user-list`, ({ users, current }) => {
       callback(users, current);
     });
@@ -156,7 +156,7 @@ export class PeerConnectionSession {
   }
 
   static createConnection() {
-    const socket = io(`${window.location.href}chat`);
+    const socket = io(`${window.location.origin}/chat`);
     return new PeerConnectionSession(socket);
   }
 }

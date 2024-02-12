@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
-import adapter from 'webrtc-adapter';
 import { Room } from './pages/Room';
+
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 const Index = () => {
   // --------------------------------------------------------------------
@@ -17,11 +18,14 @@ const Index = () => {
   useEffect(() => {
     setTimeout(() => {
       if (window) {
-        console.log('READY', adapter.browserDetails);
         setIsReady(isReady);
         ReactDOM.render(
           <React.StrictMode>
-            <Room />
+            <BrowserRouter>
+              <Routes >
+                <Route   path="/" index element={<Room />} />
+              </Routes>
+            </BrowserRouter>
           </React.StrictMode>,
           document.getElementById('react-ssr-root')
         );
