@@ -1,8 +1,4 @@
-import {
-  Controller,
-  Get,
-  Render,
-} from '@nestjs/common';
+import { Controller, Get, Render } from '@nestjs/common';
 
 @Controller()
 export class AppController {
@@ -10,15 +6,7 @@ export class AppController {
   @Render('index.tsx')
   public showHomePage() {
     return {
-      message: 'Hello NestJS',
-    };
-  }
-
-  @Get('about')
-  @Render('about.hbs')
-  public showAboutPage() {
-    return {
-      message: 'About Page',
+      message: 'Hello NestJS'
     };
   }
 }

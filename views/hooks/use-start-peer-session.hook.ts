@@ -26,7 +26,6 @@ export const useStartPeerSession = (
     if (mediaStream) {
       peerVideoConnection.joinRoom(room);
       peerVideoConnection.onAddUser((user) => {
-        console.log({"onAddUser": user})
         setConnectedUsers((users) => [...users, user]);
         peerVideoConnection.addPeerConnection(
           `${user}`,
@@ -44,7 +43,6 @@ export const useStartPeerSession = (
       });
 
       peerVideoConnection.onUpdateUserList(async (users: string[]) => {
-        console.log("onUpdateUserList", users)
         setConnectedUsers(users);
         for (const user of users) {
           peerVideoConnection.addPeerConnection(

@@ -74,7 +74,9 @@ export class MessageGateway implements OnGatewayInit, OnGatewayDisconnect {
       (socket) => socket.id === client.id
     );
 
-    if (!existingSocket) return;
+    if (!existingSocket) {
+      return;
+    }
 
     this.activeSockets = this.activeSockets.filter(
       (socket) => socket.id !== client.id

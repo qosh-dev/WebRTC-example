@@ -79,10 +79,7 @@ export class PeerConnectionSession {
 
   joinRoom(room: number) {
     this._room = room;
-
-    const res = this.socket.emit('joinRoom', room);
-
-    console.log({ 'Will joinRoom': room, res });
+    this.socket.emit('joinRoom', room);
   }
 
   onCallMade() {

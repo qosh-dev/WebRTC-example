@@ -19,4 +19,7 @@ export const Toolbar = styled.div`
   display: flex;
   position: relative;
   align-items: center;
+  color: #ffff;
+  font-weight: bold;
+
 `;

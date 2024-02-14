@@ -19,22 +19,16 @@ export const Room = () => {
   const galleryRef = useRef<any>(null);
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const mainRef = useRef<any>();
-  const { mediaStream, refreshMediaStream } =
-    useCreateMediaStream(localVideoRef);
-  const {
-    connectedUsers,
-    shareScreen,
-    cancelScreenSharing,
-    isScreenShared,
-    refreshPeerVideoConnection
-  } = useStartPeerSession(room.roomId, mediaStream, localVideoRef);
+  const mediaStream = useCreateMediaStream(localVideoRef);
+  const { connectedUsers, shareScreen, cancelScreenSharing, isScreenShared } =
+    useStartPeerSession(room.roomId, mediaStream, localVideoRef);
 
   // --------------------------------------------------------------------
   // Effects
   // --------------------------------------------------------------------
 
   useCalculateVideoLayout(galleryRef, connectedUsers.length + 1);
-  
+
   // --------------------------------------------------------------------
   // Functions
   // --------------------------------------------------------------------

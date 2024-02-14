@@ -17,7 +17,8 @@
     "resolveJsonModule": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "noImplicitAny": false
+    "noImplicitAny": false,
+    "noEmitOnError": true
   },
   "exclude": [
     "node_modules",

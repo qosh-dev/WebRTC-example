@@ -13,6 +13,7 @@ export const VideoControls = ({
   // --------------------------------------------------------------------
   // Variables
   // --------------------------------------------------------------------
+  
   const [isFullscreen, setFullscreen] = useState(false);
 
   // --------------------------------------------------------------------
@@ -47,7 +48,6 @@ export const VideoControls = ({
         <Button onClick={handleToggleFullscreen}>
           {isFullscreen ? 'Exit Full Screen' : 'Full Screen'}
         </Button>
-        ;
       </div>
     </div>
   );

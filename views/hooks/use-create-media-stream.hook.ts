@@ -39,12 +39,5 @@ export const useCreateMediaStream = (
     setUserMediaStream(stream);
   };
 
-  function refresh() {
-    createMediaStream();
-  }
-
-  return {
-    mediaStream: userMediaStream,
-    refreshMediaStream: refresh
-  };
+  return userMediaStream
 };

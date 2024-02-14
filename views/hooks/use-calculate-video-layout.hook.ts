@@ -16,12 +16,11 @@ export const useCalculateVideoLayout = (
         document.body.getBoundingClientRect().height - headerHeight;
 
       const { width, height, cols } = calculateLayout(
-        screenWidth,
-        screenHeight,
+        screenWidth === 0 ? window.innerWidth : screenWidth,
+        screenHeight === 0 ? window.innerHeight : screenHeight,
         videoCount,
         aspectRatio
       );
-
       gallery.current?.style?.setProperty('--width', width + 'px');
       gallery.current?.style?.setProperty('--height', height + 'px');
       gallery.current?.style?.setProperty('--cols', cols + '');
