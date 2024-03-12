@@ -6,11 +6,11 @@ This repository contains a project written in Nest.js that launches a React appl
 
 To run the project, first install the dependencies:
 
-npm install
+<code>npm install</code>
 
 Then, start the code:
 
-npm run start
+<code>npm run start</code>
 
 This will launch the Nest.js server and serve the React application with SSR. 
 
